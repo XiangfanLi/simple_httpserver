@@ -38,7 +38,7 @@ void *thread_routine(void *arg)
             status = condition_timedwait(&pool->ready, &abstime);  
             if(status == ETIMEDOUT)
             {
-                printf("thread %d wait timed out\n", (int)pthread_self());
+                //printf("thread %d wait timed out\n", (int)pthread_self());
                 timeout = 1;
                 break;
             }

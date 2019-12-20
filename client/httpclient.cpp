@@ -25,48 +25,40 @@ void HttpClient::run()
 {
     struct hostent *ptrh;
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-     {
-         printf("\n Socket creation error \n");
-         return;
-     }
-     serv_addr.sin_family = AF_INET;
-     serv_addr.sin_port = htons(port);
-        
-     // Convert IPv4 and IPv6 addresses from text to binary form
-  /*  
-     if(inet_pton(AF_INET, ip, &serv_addr.sin_addr)<=0)
-     {
-         printf("\nInvalid address/ Address not supported \n");
-         return;
-     }
-*/     
+	{
+	 printf("\n Socket creation error \n");
+	 return;
+	}
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(port);
+      
 
-    ptrh = gethostbyname(ip);
-    memcpy(&serv_addr.sin_addr,ptrh->h_addr,ptrh->h_length);
-     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-     {
-         printf("\nConnection Failed \n");
-         return;
-     }
-     int flags = fcntl(sock, F_GETFL, 0);
-  	 fcntl(sock, F_SETFL, flags | O_NONBLOCK);
-  	 send_finish = false;
-  	 int ret = pthread_create(&clientReceiveThreadId, 0, client_receive, (void*)this);
-	 if (ret != 0)
-     {
-         perror("pthread create failed!");
-         return;
-     }
-     string message = "GET http://lixiangfan.com/httpserver HTTP/1.1\r\nAccept: */*\r\nAccept-Language: zh-CN\r\nUser-Agent: Mozilla/4.0\r\nAccept-Encoding: gzip, deflate\r\nConnection: Keep-Alive\r\nHost: localhost:8888\r\n\r\n<h1>Hello from client!!!" + to_string(id) + "</h1> \r\n";
-     
-     strncpy(out_buffer, message.c_str(), 1024);
-	 for(int i = 0; i < requests; ++i)
-	 {
-	 	sprintf(out_buffer, "%-1024s", out_buffer);
-	    send(sock , out_buffer , strlen(out_buffer) , 0 );
-	 }
-	 send_finish = true;
-	 pthread_join(clientReceiveThreadId, NULL);
+	ptrh = gethostbyname(ip);
+	memcpy(&serv_addr.sin_addr,ptrh->h_addr,ptrh->h_length);
+	if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+	{
+	 printf("\nConnection Failed \n");
+	 return;
+	}
+	int flags = fcntl(sock, F_GETFL, 0);
+	fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+	send_finish = false;
+	int ret = pthread_create(&clientReceiveThreadId, 0, client_receive, (void*)this);
+	if (ret != 0)
+	{
+		perror("pthread create failed!");
+		return;
+	}
+	string message = "GET http://lixiangfan.com/httpserver HTTP/1.1\r\nAccept: */*\r\nAccept-Language: zh-CN\r\nUser-Agent: Mozilla/4.0\r\nAccept-Encoding: gzip, deflate\r\nConnection: Keep-Alive\r\nHost: localhost:8888\r\n\r\n<h1>Hello from client!!!" + to_string(id) + "</h1> \r\n";
+
+	strncpy(out_buffer, message.c_str(), 1024);
+	for(int i = 0; i < requests; ++i)
+	{
+	sprintf(out_buffer, "%-1024s", out_buffer);
+	send(sock , out_buffer , strlen(out_buffer) , 0 );
+	}
+	send_finish = true;
+	pthread_join(clientReceiveThreadId, NULL);
 }
 
 
